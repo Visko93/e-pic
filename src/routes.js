@@ -5,6 +5,7 @@ import css from "./styles/global.module.css";
 
 import Photos from "./components/pages/Photos";
 import Cart from "./components/pages/Cart";
+import Profile from "./components/pages/Profile";
 
 function Routes() {
   return (
@@ -17,7 +18,7 @@ function Routes() {
           <Cart />
         </Route>
         <Route path="/profile">
-          <Cart />
+          <Profile />
         </Route>
         {/* <Route component={NorFound} /> */}
       </Switch>

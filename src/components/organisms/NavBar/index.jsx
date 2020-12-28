@@ -1,82 +1,144 @@
 import * as React from "react";
 import { NavLink } from "react-router-dom";
+import classesNames from "classnames";
 
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
 
 import UserIcon from "@material-ui/icons/SupervisedUserCircleSharp";
 import Menu from "@material-ui/icons/MenuSharp";
 import CartIcon from "@material-ui/icons/ShoppingCartSharp";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeftSharp";
+import ChevronRightIcon from "@material-ui/icons/ChevronRightSharp";
 
-import css from "./style.module.css";
-
-const drawerState = {
-  opened: "OPENED",
-  hided: "HIDED",
-};
+const drawerWidth = "250px";
 
 const useStyles = makeStyles((theme) => ({
+  appBar: {
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  appBarShift: {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: drawerWidth,
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  hide: {
+    display: "none",
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+  },
   drawerPaper: {
-    width: "inherit",
+    width: drawerWidth,
+  },
+  drawerHeader: {
+    display: "flex",
+    alignItems: "center",
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+    justifyContent: "space-between",
   },
 }));
 
-function NavBar() {
+function NavBar({ open, setOpen }) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const theme = useTheme();
 
-  const toggleDrawer = (open) => (e) => {
-    if (e && e.type === "keydown" && (e.key === "Tab" || e.key === "Shift"))
-      return;
-    setOpen((prevState) => !prevState);
+  const handleDrawerOpen = () => {
+    setOpen(true);
   };
 
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
   return (
-    <Drawer
-      style={{ width: "220px" }}
-      variant="persistent"
-      anchor="left"
-      open={true}
-      classes={{ paper: classes.drawerPaper }}
-      onOpen={toggleDrawer(false)}
-      onClose={toggleDrawer(true)}
-    >
-      <List>
-        <ListItem>
-          <NavLink
-            to="/"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
+    <>
+      <AppBar
+        position="fixed"
+        className={classesNames(classes.appBar, {
+          [classes.appBarShift]: open,
+        })}
+      >
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            edge="start"
+            className={classesNames(
+              classes.menuButton,
+              open ? classes.hide : null
+            )}
           >
+            <Menu />
+          </IconButton>
+          <Typography variant="h5" noWrap>
+            E-pic
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        className={classesNames(classes.drawer, !open ? classes.hide : null)}
+        variant="persistent"
+        anchor="left"
+        open={open}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+      >
+        <div className={classes.drawerHeader}>
+          <NavLink to="/">
             <ListItemText primary="E-pics" />
-            <Menu onClick={toggleDrawer(open)} />
           </NavLink>
-        </ListItem>
-        <NavLink to="/cart">
-          <ListItem>
-            <ListItemIcon>
-              <CartIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Cart"} />
-          </ListItem>
-        </NavLink>
-        <NavLink to="/">
-          <ListItem>
-            <ListItemIcon>
-              <UserIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Profile"} />
-          </ListItem>
-        </NavLink>
-      </List>
-    </Drawer>
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === "ltr" ? (
+              <ChevronLeftIcon />
+            ) : (
+              <ChevronRightIcon />
+            )}
+          </IconButton>
+        </div>
+        <Divider />
+        <List className={classesNames(classes.drawer, classes.content)}>
+          <NavLink to="/cart">
+            <ListItem>
+              <ListItemIcon>
+                <CartIcon />
+              </ListItemIcon>
+              <ListItemText primary={"Cart"} />
+            </ListItem>
+          </NavLink>
+          <NavLink to="/profile">
+            <ListItem>
+              <ListItemIcon>
+                <UserIcon />
+              </ListItemIcon>
+              <ListItemText primary={"Profile"} />
+            </ListItem>
+          </NavLink>
+        </List>
+      </Drawer>
+    </>
   );
 }
 
